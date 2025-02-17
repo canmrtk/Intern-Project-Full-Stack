@@ -1,55 +1,64 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import "../css/LeaveRequest.css";
 
-const LeaveRequest = () => {
-  const [email, setEmail] = useState("");
-  const [leaveDays, setLeaveDays] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+const LeaveRequests = () => {
+  const [leaveRequests, setLeaveRequests] = useState([]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMessage("");
-    setError("");
+  useEffect(() => {
+    fetchLeaveRequests();
+  }, []);
 
-    if (!email || !leaveDays) {
-      setError("E-posta ve izin gün sayısı zorunludur!");
-      return;
-    }
-
+  const fetchLeaveRequests = async () => {
     try {
-      const response = await axios.post("http://localhost:9090/api/leave/request", {
-        email: email,
-        leaveDays: parseInt(leaveDays),
-      });
-
-      setMessage(response.data);
+      const response = await axios.get("http://localhost:9090/api/leave-requests");
+      setLeaveRequests(response.data);
     } catch (error) {
-      setError("İzin talebi başarısız oldu! " + (error.response?.data?.message || "Bilinmeyen hata."));
-      console.error("İzin talebi sırasında hata oluştu:", error);
+      console.error("İzin talepleri alınırken hata oluştu:", error);
     }
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "auto", padding: "20px", border: "1px solid #ccc", borderRadius: "8px" }}>
-      <h2>İzin Talebi</h2>
-      <form onSubmit={handleSubmit}>
-        <label>
-          E-Posta:
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-        </label>
-        <br />
-        <label>
-          İzin Gün Sayısı:
-          <input type="number" value={leaveDays} onChange={(e) => setLeaveDays(e.target.value)} required />
-        </label>
-        <br />
-        <button type="submit">İzin Talep Et</button>
-      </form>
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+    <div className="leave-requests-container">
+      <h2 className="leave-requests-title">İzin Talepleri</h2>
+      
+      <table className="leave-requests-table">
+        <thead>
+          <tr>
+            <th>Çalışan</th>
+            <th>E-posta</th>
+            <th>Departman</th>
+            <th>Talep Edilen Gün</th>
+            <th>Kalan İzin</th>
+            <th>Detay</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leaveRequests.length > 0 ? (
+            leaveRequests.map((request) => (
+              <tr key={request.id}>
+                <td>{request.employee.name} {request.employee.surname}</td>
+                <td>{request.employee.email}</td>
+                <td>{request.employee.department}</td>
+                <td>{request.leaveDaysRequested} Gün</td>
+                <td>{request.employee.leaveDays} Gün</td>
+                <td>
+                  <Link to={`/leave-requests/${request.employee.id}`}>
+                    <button className="detail-button">Detay</button>
+                  </Link>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="6">İzin talebi bulunamadı.</td>
+            </tr>
+          )}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-export default LeaveRequest;
+export default LeaveRequests;

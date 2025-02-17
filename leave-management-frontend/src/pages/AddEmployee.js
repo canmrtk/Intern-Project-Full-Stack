@@ -50,6 +50,15 @@ const AddEmployee = () => {
         <input type="text" name="department" value={formData.department} onChange={handleChange} required />
 
         <button type="submit">Çalışan Ekle</button>
+
+        <select name="department" onChange={handleChange} required>
+          <option value="">Departman Seç</option>
+          <option value="Human Resources">İnsan Kaynakları</option>
+          <option value="Software Development">Yazılım Geliştirme</option>
+          <option value="Graphic Designer">Grafik Tasarımcı</option>
+          <option value="Project Manager">Proje Yöneticisi</option>
+          <option value="Java Developer">Java Geliştirici</option>
+        </select>
       </form>
 
       {message && <p style={{ color: "green" }}>{message}</p>}

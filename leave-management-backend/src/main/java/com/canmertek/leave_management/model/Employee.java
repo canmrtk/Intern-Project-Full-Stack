@@ -15,6 +15,7 @@ public class Employee {
     private String name;
     private String surname;
     private String email;
+    @Column(nullable = false)
     private String department;
 
     private int leaveDays = 15; // Varsayılan olarak 15 gün izin ver

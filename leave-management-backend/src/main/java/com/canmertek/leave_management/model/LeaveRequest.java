@@ -1,10 +1,12 @@
 package com.canmertek.leave_management.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "leave_requests")
 public class LeaveRequest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,14 +17,18 @@ public class LeaveRequest {
 
     private int leaveDaysRequested;
 
-    public LeaveRequest() {}
+    private LocalDate requestDate;
+
+    public LeaveRequest() {
+        this.requestDate = LocalDate.now(); // İzin talebi oluşturulduğunda tarihi kaydeder
+    }
 
     public LeaveRequest(Employee employee, int leaveDaysRequested) {
         this.employee = employee;
         this.leaveDaysRequested = leaveDaysRequested;
+        this.requestDate = LocalDate.now();
     }
 
- 
     public Long getId() {
         return id;
     }
@@ -45,5 +51,13 @@ public class LeaveRequest {
 
     public void setLeaveDaysRequested(int leaveDaysRequested) {
         this.leaveDaysRequested = leaveDaysRequested;
+    }
+
+    public LocalDate getRequestDate() {
+        return requestDate;
+    }
+
+    public void setRequestDate(LocalDate requestDate) {
+        this.requestDate = requestDate;
     }
 }
