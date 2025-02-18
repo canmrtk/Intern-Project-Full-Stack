@@ -27,4 +27,23 @@ public class LeaveRequestController {
     public ResponseEntity<List<LeaveRequest>> getLeaveRequestsByEmployee(@PathVariable Long employeeId) {
         return ResponseEntity.ok(leaveRequestService.getLeaveRequestsByEmployee(employeeId));
     }
+    
+    @PostMapping("/request")
+    public ResponseEntity<?> requestLeave(@RequestBody LeaveRequest leaveRequest) {
+        return leaveRequestService.createLeaveRequest(leaveRequest);
+    }
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<?> approveLeaveRequest(@PathVariable Long id) {
+        return leaveRequestService.approveLeaveRequest(id);
+    }
+
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<?> rejectLeaveRequest(@PathVariable Long id) {
+        return leaveRequestService.rejectLeaveRequest(id);
+    }
+
+
+
+
 }
+

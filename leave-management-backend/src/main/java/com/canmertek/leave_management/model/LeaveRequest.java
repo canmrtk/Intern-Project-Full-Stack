@@ -6,8 +6,20 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "leave_requests")
 public class LeaveRequest {
+	
+	@Column(name = "status")
+	private String status = "PENDING"; 
 
-    @Id
+
+    public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

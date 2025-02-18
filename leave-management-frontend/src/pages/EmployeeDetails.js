@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import "../css/EmployeeDetails.css";
 
 const EmployeeDetails = () => {
   const { id } = useParams(); 
@@ -25,10 +26,12 @@ const EmployeeDetails = () => {
 
   return (
     <div className="employee-details-container">
-      <h2>Çalışan Detayları</h2>
+      <h1 className="employee-details-title">Çalışan Detayları</h1>
       <p><strong>Ad Soyad:</strong> {employee.name} {employee.surname}</p>
       <p><strong>E-posta:</strong> {employee.email}</p>
       <p><strong>Departman:</strong> {employee.department}</p>
+      <p><strong>Kalan İzin Günü:</strong> {employee.leaveDays} Gün</p>
+     
     </div>
   );
 };

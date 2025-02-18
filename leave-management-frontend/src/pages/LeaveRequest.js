@@ -13,15 +13,39 @@ const LeaveRequests = () => {
   const fetchLeaveRequests = async () => {
     try {
       const response = await axios.get("http://localhost:9090/api/leave-requests");
-      setLeaveRequests(response.data);
+      setLeaveRequests(response.data.reverse());
     } catch (error) {
       console.error("İzin talepleri alınırken hata oluştu:", error);
     }
   };
 
+  const approveLeaveRequest = async (id) => {
+    if (!window.confirm("Bu izin talebini onaylamak istediğine emin misin?")) return;
+
+    try {
+      await axios.put(`http://localhost:9090/api/leave-requests/${id}/approve`);
+      setLeaveRequests(leaveRequests.map(request => 
+        request.id === id ? { ...request, status: "APPROVED" } : request
+      ));
+    } catch (error) {
+      console.error("İzin talebi onaylanırken hata oluştu:", error);
+    }
+  };
+
+  const rejectLeaveRequest = async (id) => {
+    if (!window.confirm("Bu izin talebini reddetmek istediğine emin misin?")) return;
+
+    try {
+      await axios.put(`http://localhost:9090/api/leave-requests/${id}/reject`);
+      setLeaveRequests(leaveRequests.filter(request => request.id !== id));
+    } catch (error) {
+      console.error("İzin talebi reddedilirken hata oluştu:", error);
+    }
+  };
+
   return (
     <div className="leave-requests-container">
-      <h2 className="leave-requests-title">İzin Talepleri</h2>
+      <h1 className="leave-requests-title">İzin Talepleri</h1>
       
       <table className="leave-requests-table">
         <thead>
@@ -31,7 +55,10 @@ const LeaveRequests = () => {
             <th>Departman</th>
             <th>Talep Edilen Gün</th>
             <th>Kalan İzin</th>
+            <th>Durum</th>
             <th>Detay</th>
+            <th>Onayla</th>
+            <th>Reddet</th>
           </tr>
         </thead>
         <tbody>
@@ -44,15 +71,30 @@ const LeaveRequests = () => {
                 <td>{request.leaveDaysRequested} Gün</td>
                 <td>{request.employee.leaveDays} Gün</td>
                 <td>
+                  <span className={request.status === "APPROVED" ? "status-approved" : "status-pending"}>
+                    {request.status === "APPROVED" ? "Onaylandı" : "Bekliyor"}
+                  </span>
+                </td>
+                <td>
                   <Link to={`/leave-requests/${request.employee.id}`}>
                     <button className="detail-button">Detay</button>
                   </Link>
+                </td>
+                <td>
+                  {request.status !== "APPROVED" && (
+                    <button className="approve-button" onClick={() => approveLeaveRequest(request.id)}>Onayla</button>
+                  )}
+                </td>
+                <td>
+                  {request.status !== "APPROVED" && (
+                    <button className="reject-button" onClick={() => rejectLeaveRequest(request.id)}>Reddet</button>
+                  )}
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="6">İzin talebi bulunamadı.</td>
+              <td colSpan="9">İzin talebi bulunamadı.</td>
             </tr>
           )}
         </tbody>

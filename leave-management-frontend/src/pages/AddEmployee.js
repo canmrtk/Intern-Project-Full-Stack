@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "../css/AddEmployee.css";  
 
 const AddEmployee = () => {
   const [formData, setFormData] = useState({
@@ -34,8 +35,8 @@ const AddEmployee = () => {
   };
 
   return (
-    <div style={{ maxWidth: "400px", margin: "auto", padding: "20px", border: "1px solid #ccc", borderRadius: "8px" }}>
-      <h2>Yeni Çalışan Ekle</h2>
+    <div className="add-employee-container">
+      <h1 className="employee-add-title">Yeni Çalışan Ekle</h1>
       <form onSubmit={handleSubmit}>
         <label>Ad:</label>
         <input type="text" name="name" value={formData.name} onChange={handleChange} required />
@@ -47,11 +48,7 @@ const AddEmployee = () => {
         <input type="email" name="email" value={formData.email} onChange={handleChange} required />
 
         <label>Departman:</label>
-        <input type="text" name="department" value={formData.department} onChange={handleChange} required />
-
-        <button type="submit">Çalışan Ekle</button>
-
-        <select name="department" onChange={handleChange} required>
+        <select name="department" value={formData.department} onChange={handleChange} required>
           <option value="">Departman Seç</option>
           <option value="Human Resources">İnsan Kaynakları</option>
           <option value="Software Development">Yazılım Geliştirme</option>
@@ -59,10 +56,12 @@ const AddEmployee = () => {
           <option value="Project Manager">Proje Yöneticisi</option>
           <option value="Java Developer">Java Geliştirici</option>
         </select>
+
+        <button type="submit">Çalışan Ekle</button>
       </form>
 
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {message && <p className="success-message">{message}</p>}
+      {error && <p className="error-message">{error}</p>}
     </div>
   );
 };

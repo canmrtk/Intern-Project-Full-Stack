@@ -1,0 +1,81 @@
+.add-employee-container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 45px;
+    background: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 16px;
+    text-align: center;
+  }
+  
+  .employee-add-title {
+    text-align: center;
+    font-size: 30px;
+    font-weight: bold;
+    color: #000000;
+    margin-bottom: 15px;
+    margin-top: 5px;
+  }
+  
+  .add-employee-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .add-employee-container label {
+    text-align: left;
+    font-weight: bold;
+  }
+  
+  .add-employee-container input,
+  .add-employee-container select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  
+  .add-employee-container select {
+    cursor: pointer;
+  }
+  
+  .add-employee-container button {
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .add-employee-container button:hover {
+    background-color: #0056b3;
+  }
+  
+  .success-message {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .error-message {
+    color: red;
+    font-weight: bold;
+  }
+  
+
+  /* Mobil Uyum */
+  @media (max-width: 600px) {
+    .add-employee-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .add-employee-container button {
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+  }

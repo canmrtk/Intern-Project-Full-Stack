@@ -9,6 +9,8 @@ import EmployeeDetails from "./pages/EmployeeDetails";
 
 import LeaveRequestDetails from "./pages/LeaveRequestDetails";
 
+import NewLeaveRequest from "./pages/NewLeaveRequest";
+
 
 
 
@@ -21,8 +23,9 @@ function App() {
       <nav>
         <ul>
           <li><Link to="/employees">Çalışan Listesi</Link></li>
-          <li><Link to="/leave-request">İzin Talebi</Link></li>
+          <li><Link to="/leave-request">Geçmiş İzin Listesi</Link></li>
           <li><Link to="/add-employee">Çalışan Ekle</Link></li>
+          <li><Link to="/new-leave-request">İzin Talep et</Link></li>
         </ul>
       </nav>
 
@@ -34,6 +37,7 @@ function App() {
         <Route path="/update-employee/:id" element={<UpdateEmployee />} />
         <Route path="/employee-details/:id" element={<EmployeeDetails />} />
         <Route path="/leave-requests/:employeeId" element={<LeaveRequestDetails />} />
+        <Route path="/new-leave-request" element={<NewLeaveRequest />} />
       </Routes>
     </Router>
   );

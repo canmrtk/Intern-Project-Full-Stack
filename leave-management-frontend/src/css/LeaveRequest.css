@@ -1,7 +1,10 @@
 .leave-requests-container {
     max-width: 800px;
     margin: 40px auto;
-    padding: 20px;
+    padding: 50px;
+    
+    padding-inline-start: 40px;
+    padding-inline-end: 140px;
     background: white;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
@@ -9,9 +12,11 @@
   
   .leave-requests-title {
     text-align: center;
-    font-size: 22px;
+    font-size: 30px;
     font-weight: bold;
-    margin-bottom: 20px;
+    color: #000000;
+    margin-bottom: 15px;
+    margin-top: 5px;
   }
   
   .leave-requests-table {
@@ -41,5 +46,56 @@
   
   .detail-button:hover {
     background-color: #0056b3;
+  }
+
+  .reject-button {
+    padding: 8px 12px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+  }
+  
+  .reject-button:hover {
+    background-color: #a71d2a;
+  }
+
+  .approve-button {
+    padding: 8px 12px;
+    background-color: #108800;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+  }
+  
+  .approve-button:hover {
+    background-color: #1c5302;
+  }
+
+  
+   /* Mobil Uyum */
+   @media (max-width: 600px) {
+    .leave-requests-table {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .detail-button {
+      width: 100%;
+      margin-top: 10px;
+    }
+    .approve-button {
+      width: 100%;
+      margin-top: 10px;
+    }
+    .reject-button {
+      width: 100%;
+      margin-top: 10px;
+    }
+    
   }
   

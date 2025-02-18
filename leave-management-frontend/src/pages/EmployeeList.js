@@ -15,7 +15,7 @@ const EmployeeList = () => {
   const fetchEmployees = async () => {
     try {
       const response = await axios.get("http://localhost:9090/api/employees");
-      setEmployees(response.data);
+      setEmployees(response.data.reverse()); 
     } catch (error) {
       console.error("Çalışanları getirirken hata oluştu:", error);
     }
@@ -30,7 +30,7 @@ const EmployeeList = () => {
 
   return (
     <div className="employee-list-container">
-      <h2 className="employee-list-title">Çalışan Listesi</h2>
+      <h1 className="employee-list-title">Çalışan Listesi</h1>
 
       {/* Arama Kutusu */}
       <input
@@ -62,8 +62,7 @@ const EmployeeList = () => {
             <li key={employee.id} className="employee-item">
               <div className="employee-info">
                 <p><strong>{employee.name} {employee.surname}</strong></p>
-                <p>{employee.email}</p>
-                <p>Departman: {employee.department}</p>
+                <p>{employee.department}</p>
               </div>
               <div>
                 <Link to={`/employee-details/${employee.id}`}>
