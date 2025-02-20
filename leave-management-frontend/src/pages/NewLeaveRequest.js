@@ -2,17 +2,18 @@ import React, { useState } from "react";
 import axios from "axios";
 import "../css/NewLeaveRequest.css";
 
+
+
 const NewLeaveRequest = () => {
   const [formData, setFormData] = useState({
     employeeEmail: "",
     leaveDaysRequested: "",
   });
 
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState({ text: "", type: "" });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
     setFormData({ ...formData, [name]: value });
   };
 
@@ -32,14 +33,18 @@ const NewLeaveRequest = () => {
 
       setMessage({ text: "İzin talebiniz başarıyla oluşturuldu ve onay bekliyor.", type: "success" });
     } catch (error) {
-      setMessage({ text: "İzin talebi oluşturulamadı: " + error.response.data, type: "error" });
+      setMessage({ 
+        text: error.response?.data || "İzin talebi oluşturulamadı. Lütfen tekrar deneyin.", 
+        type: "error" 
+      });
     }
   };
 
   return (
+    
     <div className="leave-request-container">
       <h1 className="leave-request-title">Yeni İzin Talebi</h1>
-      {message && (
+      {message.text && (
         <p className={message.type === "success" ? "success-message" : "error-message"}>
           {message.text}
         </p>

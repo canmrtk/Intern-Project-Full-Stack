@@ -4,11 +4,13 @@ import com.canmertek.leave_management.model.Employee;
 import com.canmertek.leave_management.model.LeaveRequest;
 import com.canmertek.leave_management.repository.EmployeeRepository;
 import com.canmertek.leave_management.repository.LeaveRequestRepository;
+
+import jakarta.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -30,21 +32,21 @@ public class LeaveRequestService {
     }
 
     // Yeni izin talebi oluştur
-    public ResponseEntity<?> createLeaveRequest(LeaveRequest leaveRequest) {
+    public ResponseEntity<?> createLeaveRequest(@Valid LeaveRequest leaveRequest) {
         Employee employee = employeeRepository.findByEmail(leaveRequest.getEmployee().getEmail())
                 .orElseThrow(() -> new RuntimeException("Çalışan bulunamadı!"));
 
-        if (leaveRequest.getLeaveDaysRequested() < 1) {
-            return ResponseEntity.badRequest().body("İzin günü en az 1 olmalıdır!");
+        if (leaveRequestRepository.existsByEmployeeAndStatus(employee, "PENDING")) {
+            return ResponseEntity.badRequest().body("Zaten bekleyen bir izin talebiniz var!");
         }
 
-        // ✅ Çalışanın izin gününü değiştirme! (İzin günleri onaylanınca düşecek)
         leaveRequest.setEmployee(employee);
-        leaveRequest.setStatus("PENDING"); // ✅ Varsayılan olarak beklemede olacak
+        leaveRequest.setStatus("PENDING");
         leaveRequestRepository.save(leaveRequest);
 
         return ResponseEntity.ok("İzin talebi başarıyla oluşturuldu ve onay bekliyor.");
     }
+
 
 
     public void deleteLeaveRequest(Long id) {
@@ -68,7 +70,7 @@ public class LeaveRequestService {
             return ResponseEntity.badRequest().body("Çalışanın yeterli izin günü yok!");
         }
 
-        // ✅ Onay verildiğinde çalışanın izin günlerini düş
+        // Onay verildiğinde çalışanın izin günlerini düş
         employee.setLeaveDays(employee.getLeaveDays() - leaveRequest.getLeaveDaysRequested());
         employeeRepository.save(employee);
 
@@ -87,10 +89,10 @@ public class LeaveRequestService {
             return ResponseEntity.badRequest().body("Bu izin zaten onaylanmış, iptal edilemez!");
         }
 
-        // İzin talebini sistemden kaldır
         leaveRequestRepository.deleteById(id);
         return ResponseEntity.ok("İzin talebi reddedildi.");
     }
+
 
 
 

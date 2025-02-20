@@ -1,6 +1,9 @@
 package com.canmertek.leave_management.controller;
 
+import com.canmertek.leave_management.model.Employee;
 import com.canmertek.leave_management.model.LeaveRequest;
+import com.canmertek.leave_management.repository.EmployeeRepository;
+import com.canmertek.leave_management.repository.LeaveRequestRepository;
 import com.canmertek.leave_management.service.LeaveRequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,12 @@ public class LeaveRequestController {
     @Autowired
     private LeaveRequestService leaveRequestService;
 
+    @Autowired
+    private LeaveRequestRepository leaveRequestRepository;
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
     //Tüm izin taleplerini listeleme
     @GetMapping
     public ResponseEntity<List<LeaveRequest>> getAllLeaveRequests() {
@@ -23,10 +32,15 @@ public class LeaveRequestController {
     }
 
     //Belirli bir çalışanın izin taleplerini listeleme
-    @GetMapping("/{employeeId}")
+    @GetMapping("/employee/{employeeId}")
     public ResponseEntity<List<LeaveRequest>> getLeaveRequestsByEmployee(@PathVariable Long employeeId) {
-        return ResponseEntity.ok(leaveRequestService.getLeaveRequestsByEmployee(employeeId));
+        Employee employee = employeeRepository.findById(employeeId)
+                .orElseThrow(() -> new RuntimeException("Çalışan bulunamadı!"));
+
+        List<LeaveRequest> leaveRequests = leaveRequestRepository.findByEmployee(employee);
+        return ResponseEntity.ok(leaveRequests);
     }
+    
     
     @PostMapping("/request")
     public ResponseEntity<?> requestLeave(@RequestBody LeaveRequest leaveRequest) {
@@ -41,6 +55,8 @@ public class LeaveRequestController {
     public ResponseEntity<?> rejectLeaveRequest(@PathVariable Long id) {
         return leaveRequestService.rejectLeaveRequest(id);
     }
+    
+
 
 
 

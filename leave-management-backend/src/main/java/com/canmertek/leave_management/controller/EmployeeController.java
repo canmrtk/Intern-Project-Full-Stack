@@ -2,6 +2,7 @@ package com.canmertek.leave_management.controller;
 
 import com.canmertek.leave_management.exception.ResourceNotFoundException;
 import com.canmertek.leave_management.model.Employee;
+import com.canmertek.leave_management.repository.EmployeeRepository;
 import com.canmertek.leave_management.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ public class EmployeeController {
 
     @Autowired
     private EmployeeService employeeService;
+    @Autowired
+    private EmployeeRepository employeeRepository;
 
    
     @GetMapping
@@ -39,11 +42,7 @@ public class EmployeeController {
     }
 
     
-    @PutMapping("/{id}")
-    public ResponseEntity<Employee> updateEmployee(@PathVariable Long id, @Valid @RequestBody Employee employee) {
-        Employee updatedEmployee = employeeService.updateEmployee(id, employee);
-        return ResponseEntity.ok(updatedEmployee);
-    }
+  
 
     
     @DeleteMapping("/{id}")
@@ -55,4 +54,20 @@ public class EmployeeController {
         employeeService.deleteEmployee(id);
         return ResponseEntity.ok("Çalışan başarıyla silindi!");
     }
+    
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateEmployee(@PathVariable Long id, @RequestBody Employee updatedEmployee) {
+        Employee employee = employeeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Çalışan bulunamadı!"));
+
+        employee.setName(updatedEmployee.getName());
+        employee.setSurname(updatedEmployee.getSurname());
+        employee.setEmail(updatedEmployee.getEmail());
+        employee.setDepartment(updatedEmployee.getDepartment());
+        
+
+        employeeRepository.save(employee);
+        return ResponseEntity.ok("Çalışan bilgileri başarıyla güncellendi.");
+    }
+
 }

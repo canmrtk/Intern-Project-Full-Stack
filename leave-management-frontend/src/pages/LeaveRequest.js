@@ -5,6 +5,7 @@ import "../css/LeaveRequest.css";
 
 const LeaveRequests = () => {
   const [leaveRequests, setLeaveRequests] = useState([]);
+  const [message, setMessage] = useState({ text: "", type: "" });
 
   useEffect(() => {
     fetchLeaveRequests();
@@ -27,8 +28,9 @@ const LeaveRequests = () => {
       setLeaveRequests(leaveRequests.map(request => 
         request.id === id ? { ...request, status: "APPROVED" } : request
       ));
+      setMessage({ text: "İzin talebi onaylandı.", type: "success" });
     } catch (error) {
-      console.error("İzin talebi onaylanırken hata oluştu:", error);
+      setMessage({ text: error.response?.data || "Onay sırasında hata oluştu.", type: "error" });
     }
   };
 
@@ -38,8 +40,9 @@ const LeaveRequests = () => {
     try {
       await axios.put(`http://localhost:9090/api/leave-requests/${id}/reject`);
       setLeaveRequests(leaveRequests.filter(request => request.id !== id));
+      setMessage({ text: "İzin talebi reddedildi.", type: "success" });
     } catch (error) {
-      console.error("İzin talebi reddedilirken hata oluştu:", error);
+      setMessage({ text: error.response?.data || "Reddetme sırasında hata oluştu.", type: "error" });
     }
   };
 
@@ -47,6 +50,12 @@ const LeaveRequests = () => {
     <div className="leave-requests-container">
       <h1 className="leave-requests-title">İzin Talepleri</h1>
       
+      {message.text && (
+        <p className={message.type === "success" ? "success-message" : "error-message"}>
+          {message.text}
+        </p>
+      )}
+
       <table className="leave-requests-table">
         <thead>
           <tr>

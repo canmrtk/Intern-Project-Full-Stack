@@ -1,5 +1,4 @@
-.leave-request-container {
-    
+.update-employee-container {
     max-width: 500px;
     margin: 30px auto;
     padding: 50px;
@@ -10,27 +9,33 @@
     border-radius: 10px;
     text-align: center;
   }
-  
-  .leave-request-title {
+
+  .update-employee-container h1{
     text-align: center;
     font-size: 30px;
     font-weight: bold;
     color: #000000;
     margin-bottom: 15px;
     margin-top: 5px;
+    
   }
-  
-  input {
+
+  .update-employee-container input,
+  .update-employee-container select {
     width: 100%;
     padding: 10px;
-    margin: 10px 0;
     border: 1px solid #ddd;
     border-radius: 5px;
+    font-size: 16px;
   }
   
-  button {
+  .update-employee-container select {
+    cursor: pointer;
+  }
+
+  .update-employee-container button {
     padding: 10px 15px;
-    background-color: #007bff;
+    background-color: #b30dbb;
     color: white;
     border: none;
     border-radius: 5px;
@@ -38,17 +43,25 @@
     font-size: 16px;
   }
   
-  button:hover {
+  .update-employee-container button:hover {
     background-color: #0056b3;
   }
-  
-  .success-message {
+  .message {
     color: green;
     font-weight: bold;
   }
   
-  .error-message {
-    color: red;
-    font-weight: bold;
-  }
+
+   /* Mobil Uyum */
+   @media (max-width: 600px) {
+    .update-employee-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   
+    .update-employee-container button {
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+  }
