@@ -15,12 +15,22 @@ public class Employee {
     private String name;
     private String surname;
     private String email;
+    private String password;
     @Column(nullable = false)
     private String department;
 
     private int leaveDays = 15; // Varsayılan olarak 15 gün izin ver
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
-    public Employee() {}
+    
+
+	public Employee() {}
+    
+    public enum Role {
+        EMPLOYEE, // Çalışan
+        MANAGER   // Yönetici
+    }
 
     public Employee(String name, String surname, String email, String department) {
         this.name = name;
@@ -77,4 +87,20 @@ public class Employee {
     public void setLeaveDays(int leaveDays) { 
         this.leaveDays = leaveDays;
     }
+    
+    public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
 }

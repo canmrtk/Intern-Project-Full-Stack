@@ -11,6 +11,10 @@ import LeaveRequestDetails from "./pages/LeaveRequestDetails";
 
 import NewLeaveRequest from "./pages/NewLeaveRequest";
 
+import Login from "./pages/Login";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
+import ManagerDashboard from "./pages/ManagerDashboard";
+
 
 
 
@@ -38,6 +42,10 @@ function App() {
         <Route path="/employee-details/:id" element={<EmployeeDetails />} />
         <Route path="/leave-requests/:employeeId" element={<LeaveRequestDetails />} />
         <Route path="/new-leave-request" element={<NewLeaveRequest />} />
+        <Route path="/" element={<Login setUser={setUser} />} />
+        {user && user.role === "EMPLOYEE" && <Route path="/employee-dashboard" element={<EmployeeDashboard />} />}
+        {user && user.role === "MANAGER" && <Route path="/manager-dashboard" element={<ManagerDashboard />} />}
+      
       </Routes>
     </Router>
   );
