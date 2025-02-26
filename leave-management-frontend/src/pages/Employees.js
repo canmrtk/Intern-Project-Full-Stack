@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+/*import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 
@@ -17,7 +17,7 @@ const Employees = () => {
 
   return (
     <div>
-      <h2>Çalışan Listesi</h2>
+      <h2>Çalışan Listes</h2>
       <table border="1">
         <thead>
           <tr>
@@ -50,4 +50,4 @@ const Employees = () => {
   );
 };
 
-export default Employees;
+export default Employees; */

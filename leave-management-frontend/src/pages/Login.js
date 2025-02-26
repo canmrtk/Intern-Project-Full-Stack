@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../css/Login.css";
+import "../css/EmployeeDashboard.css";
+
+
 
 const Login = ({ setUser }) => {
   const [formData, setFormData] = useState({
@@ -34,7 +36,7 @@ const Login = ({ setUser }) => {
   };
 
   return (
-    <div className="login-container">
+    <div className="dashboard-container">
       <h1>Giriş Yap</h1>
       <form onSubmit={handleSubmit}>
         <label>E-posta:</label>
@@ -43,7 +45,8 @@ const Login = ({ setUser }) => {
         <label>Şifre:</label>
         <input type="password" name="password" value={formData.password} onChange={handleChange} required />
 
-        <button type="submit">Giriş Yap</button>
+        <button type="submit" className="dashboard-button">Giriş Yap</button>
+        
       </form>
 
       {message && <p className="error-message">{message}</p>}

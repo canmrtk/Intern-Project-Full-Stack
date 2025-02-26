@@ -9,27 +9,27 @@ public class LeaveRequestDTO {
 
     @NotBlank(message = "E-posta adresi boş olamaz!")
     @Email(message = "Geçerli bir e-posta adresi giriniz!")
-    private String email;
+    private String employeeEmail; 
 
     @NotNull(message = "İzin gün sayısı boş olamaz!")
     @Min(value = 1, message = "En az 1 gün izin almalısınız!")
-    private int leaveDays;
+    private int leaveDaysRequested; 
 
     public LeaveRequestDTO() {}
 
-    public String getEmail() {
-        return email;
+    public String getEmployeeEmail() {
+        return employeeEmail;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setEmployeeEmail(String employeeEmail) {
+        this.employeeEmail = employeeEmail;
     }
 
-    public int getLeaveDays() {
-        return leaveDays;
+    public int getLeaveDaysRequested() {
+        return leaveDaysRequested;
     }
 
-    public void setLeaveDays(int leaveDays) {
-        this.leaveDays = leaveDays;
+    public void setLeaveDaysRequested(int leaveDaysRequested) {
+        this.leaveDaysRequested = leaveDaysRequested;
     }
 }

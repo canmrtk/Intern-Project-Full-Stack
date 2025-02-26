@@ -87,6 +87,7 @@ const LeaveRequests = () => {
                 <td>
                   <Link to={`/leave-requests/${request.employee.id}`}>
                     <button className="detail-button">Detay</button>
+                    
                   </Link>
                 </td>
                 <td>

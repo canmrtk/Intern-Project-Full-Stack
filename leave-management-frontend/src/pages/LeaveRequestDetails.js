@@ -20,6 +20,18 @@ const LeaveRequestDetails = () => {
     }
   };
 
+  // İzin durumu için Türkçeleştirme fonksiyonu
+  const getStatusText = (status) => {
+    switch (status) {
+      case "APPROVED":
+        return "Onaylandı.";
+      case "REJECTED":
+        return "Reddedildi.";
+      default:
+        return "Beklemede.";
+    }
+  };
+
   return (
     <div className="leave-requests-container">
       <h2 className="leave-requests-title">İzin Geçmişi</h2>
@@ -29,6 +41,7 @@ const LeaveRequestDetails = () => {
           <tr>
             <th>Talep Edilen Gün</th>
             <th>Talep Tarihi</th>
+            <th>Durum</th>
           </tr>
         </thead>
         <tbody>
@@ -36,12 +49,13 @@ const LeaveRequestDetails = () => {
             leaveRequests.map((request) => (
               <tr key={request.id}>
                 <td>{request.leaveDaysRequested} Gün</td>
-                <td>{new Date(request.requestDate).toLocaleDateString()}</td>
+                <td>{request.requestDate ? new Date(request.requestDate).toLocaleDateString() : "Bilinmiyor"}</td>
+                <td>{getStatusText(request.status)}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="2">İzin geçmişi bulunamadı.</td>
+              <td colSpan="3">İzin geçmişi bulunamadı.</td>
             </tr>
           )}
         </tbody>

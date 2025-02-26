@@ -66,7 +66,7 @@ const EmployeeList = () => {
               </div>
               <div>
                 <Link to={`/employee-details/${employee.id}`}>
-                  <button className="detail-button">Detay</button>
+                  <button className="detail-button-list">Detay</button>
                 </Link>
                 <Link to={`/update-employee/${employee.id}`}>
                   <button className="update-button">Güncelle</button>

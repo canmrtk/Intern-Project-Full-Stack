@@ -3,7 +3,7 @@
     max-width: 800px;
     margin: 40px auto;
     padding: 30px;
-    background: #ffffff;
+    background: #fafafa;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
   }
@@ -55,7 +55,7 @@
   .update-button {
     padding: 8px 12px;
     margin-left: 5px;
-    background-color: #007bff;
+    background-color: #0b7734bb;
     color: white;
     border: none;
     border-radius: 5px;
@@ -64,12 +64,12 @@
   }
   
   .update-button:hover {
-    background-color: #0056b3;
+    background-color: #074b23;
   }
 
-  .detail-button {
+  .detail-button-list {
     padding: 8px 12px;
-    background-color: #007bff;
+    background-color: #800B;
     color: white;
     border: none;
     border-radius: 5px;
@@ -77,8 +77,8 @@
     transition: background 0.3s ease-in-out;
   }
   
-  .detail-button:hover {
-    background-color: #0056b3;
+  .detail-button-list:hover {
+    background-color: #7a0f26
   }
   
   /* Mobil Uyum */

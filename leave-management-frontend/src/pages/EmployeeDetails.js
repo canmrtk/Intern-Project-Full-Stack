@@ -32,7 +32,7 @@ const EmployeeDetails = () => {
   };
 
   if (!employee) {
-    return <p>Yükleniyor...</p>;
+    return <p>Çalışan Yok.</p>;
   }
 
   return (
@@ -43,33 +43,7 @@ const EmployeeDetails = () => {
       <p><strong>Departman:</strong> {employee.department}</p>
       <p><strong>Kalan İzin Günü:</strong> {employee.leaveDays} gün</p>
 
-      <h2>📌 İzin Geçmişi</h2>
-      {leaveHistory.length > 0 ? (
-        <table className="leave-history-table">
-          <thead>
-            <tr>
-              <th>Talep Edilen Gün</th>
-              <th>Durum</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaveHistory.map((leave) => (
-              <tr key={leave.id}>
-                <td>{leave.leaveDaysRequested} gün</td>
-                <td>
-                  {leave.status === "APPROVED" ? (
-                    <span className="status-approved">Onaylandı</span>
-                  ) : (
-                    <span className="status-pending">Bekliyor</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>İzin geçmişi bulunamadı.</p>
-      )}
+      
     </div>
   );
 };

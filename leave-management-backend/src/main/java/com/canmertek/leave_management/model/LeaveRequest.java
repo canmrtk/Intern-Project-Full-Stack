@@ -6,20 +6,8 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "leave_requests")
 public class LeaveRequest {
-	
-	@Column(name = "status")
-	private String status = "PENDING"; 
 
-
-    public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
@@ -29,18 +17,26 @@ public class LeaveRequest {
 
     private int leaveDaysRequested;
 
+    @Column(name = "status")
+    private String status; 
+
     private LocalDate requestDate;
 
+    
     public LeaveRequest() {
-        this.requestDate = LocalDate.now(); // İzin talebi oluşturulduğunda tarihi kaydeder
-    }
-
-    public LeaveRequest(Employee employee, int leaveDaysRequested) {
-        this.employee = employee;
-        this.leaveDaysRequested = leaveDaysRequested;
+        this.status = "PENDING";
         this.requestDate = LocalDate.now();
     }
 
+    
+    public LeaveRequest(Employee employee, int leaveDaysRequested) {
+        this.employee = employee;
+        this.leaveDaysRequested = leaveDaysRequested;
+        this.status = "PENDING";
+        this.requestDate = LocalDate.now();
+    }
+
+   
     public Long getId() {
         return id;
     }
@@ -63,6 +59,14 @@ public class LeaveRequest {
 
     public void setLeaveDaysRequested(int leaveDaysRequested) {
         this.leaveDaysRequested = leaveDaysRequested;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public LocalDate getRequestDate() {

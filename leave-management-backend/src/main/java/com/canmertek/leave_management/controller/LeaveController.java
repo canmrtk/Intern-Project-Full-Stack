@@ -15,7 +15,7 @@ public class LeaveController {
 
     @PostMapping("/request") 
     public ResponseEntity<String> requestLeave(@RequestBody LeaveRequestDTO leaveRequestDTO) {
-        String result = leaveService.requestLeaveByEmail(leaveRequestDTO.getEmail(), leaveRequestDTO.getLeaveDays());
+        String result = leaveService.requestLeaveByEmail(leaveRequestDTO.getEmployeeEmail(), leaveRequestDTO.getLeaveDaysRequested());
         return ResponseEntity.ok(result);
     }
 }
