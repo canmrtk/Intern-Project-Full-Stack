@@ -11,4 +11,9 @@ public class RabbitMQConfig {
     public Queue leaveRequestQueue() {
         return new Queue("leaveRequestsQueue", true);
     }
+
+    @Bean
+    public Queue notificationQueue() {
+        return new Queue("notificationsQueue", true);
+    }
 }

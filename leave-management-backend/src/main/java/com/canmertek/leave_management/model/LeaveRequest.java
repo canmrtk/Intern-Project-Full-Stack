@@ -1,79 +1,38 @@
 package com.canmertek.leave_management.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
 @Table(name = "leave_requests")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class LeaveRequest {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "employee_id", nullable = false)
     private Employee employee;
 
     private int leaveDaysRequested;
-
-    @Column(name = "status")
-    private String status; 
-
     private LocalDate requestDate;
+    private String status;
 
-    
-    public LeaveRequest() {
-        this.status = "PENDING";
-        this.requestDate = LocalDate.now();
-    }
-
-    
+    // Özel Constructor
     public LeaveRequest(Employee employee, int leaveDaysRequested) {
+        this.id = UUID.randomUUID(); // UUID'yi elle oluşturuyoruz.
         this.employee = employee;
         this.leaveDaysRequested = leaveDaysRequested;
-        this.status = "PENDING";
         this.requestDate = LocalDate.now();
-    }
-
-   
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(Employee employee) {
-        this.employee = employee;
-    }
-
-    public int getLeaveDaysRequested() {
-        return leaveDaysRequested;
-    }
-
-    public void setLeaveDaysRequested(int leaveDaysRequested) {
-        this.leaveDaysRequested = leaveDaysRequested;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public LocalDate getRequestDate() {
-        return requestDate;
-    }
-
-    public void setRequestDate(LocalDate requestDate) {
-        this.requestDate = requestDate;
+        this.status = "PENDING";
     }
 }

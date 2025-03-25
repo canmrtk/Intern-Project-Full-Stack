@@ -3,11 +3,12 @@ package com.company.backend;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-class LeaveManagementBackendApplicationTests {
+import com.canmertek.backend.LeaveManagementBackendApplication;
 
-	@Test
-	void contextLoads() {
-	}
+@SpringBootTest(classes = LeaveManagementBackendApplication.class)
+public class LeaveManagementBackendApplicationTests {
 
+    @Test
+    void contextLoads() {
+    }
 }

@@ -1,6 +1,7 @@
 package com.canmertek.leave_management.service;
 
 import com.canmertek.leave_management.exception.ResourceNotFoundException;
+import java.util.UUID;
 import com.canmertek.leave_management.model.Employee;
 import com.canmertek.leave_management.repository.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,7 @@ public class EmployeeService {
     }
 
     // ID ile çalışan getir
-    public Employee getEmployeeById(Long id) {
+    public Employee getEmployeeById(UUID id) {
         return employeeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ID " + id + " ile çalışan bulunamadı!"));
     }
@@ -37,7 +38,7 @@ public class EmployeeService {
     }
 
     // Çalışan güncelle
-    public Employee updateEmployee(Long id, Employee updatedEmployee) {
+    public Employee updateEmployee(UUID id, Employee updatedEmployee) {
         Employee employee = getEmployeeById(id);
         employee.setName(updatedEmployee.getName());
         employee.setSurname(updatedEmployee.getSurname());
@@ -47,7 +48,7 @@ public class EmployeeService {
     }
 
     // Çalışan sil
-    public void deleteEmployee(Long id) {
+    public void deleteEmployee(UUID id) {
         Employee employee = getEmployeeById(id);
         employeeRepository.delete(employee);
     }
