@@ -1,18 +1,24 @@
 package com.canmertek.leave_management.service;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 public class NotificationService {
 
-    private final RabbitTemplate rabbitTemplate;
+    private final List<String> notifications = new LinkedList<>();
 
-    public NotificationService(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
+    public void addNotification(String message) {
+        notifications.add(0, message); // Son gelen mesaj en başta gösterilir
+        if (notifications.size() > 20) {
+            notifications.remove(notifications.size() - 1); // Son 20 mesajı tut
+        }
     }
 
-    public void sendNotification(String message) {
-        rabbitTemplate.convertAndSend("notificationsQueue", message);
+    public List<String> getAllNotifications() {
+        return Collections.unmodifiableList(notifications);
     }
 }

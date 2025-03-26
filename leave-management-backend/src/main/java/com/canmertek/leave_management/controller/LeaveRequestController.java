@@ -7,6 +7,7 @@ import com.canmertek.leave_management.service.LeaveRequestService;
 import com.canmertek.leave_management.repository.EmployeeRepository;
 import com.canmertek.leave_management.repository.LeaveRequestRepository;
 
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,10 @@ public class LeaveRequestController {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+    
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
 
     // Tüm izin taleplerini listeleme
     @GetMapping
@@ -52,34 +57,35 @@ public class LeaveRequestController {
 
     // Yeni izin talebi oluştur
     @PostMapping("/request")
-    public ResponseEntity<?> requestLeave(@RequestBody LeaveRequestDTO leaveRequestDTO) {
-        try {
-            Optional<Employee> employeeOpt = employeeRepository.findByEmail(leaveRequestDTO.getEmployeeEmail());
+    public ResponseEntity<String> requestLeave(@RequestBody LeaveRequestDTO leaveRequestDTO) {
+        Optional<Employee> employeeOpt = employeeRepository.findByEmail(leaveRequestDTO.getEmployeeEmail());
 
-            if (employeeOpt.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Çalışan bulunamadı!");
-            }
-
-            Employee employee = employeeOpt.get();
-
-            if (employee.getLeaveDays() < leaveRequestDTO.getLeaveDaysRequested()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Yetersiz izin gününüz var!");
-            }
-
-            LeaveRequest leaveRequest = new LeaveRequest(employee, leaveRequestDTO.getLeaveDaysRequested());
-            leaveRequestRepository.save(leaveRequest);
-
-            return ResponseEntity.ok("İzin talebi başarıyla oluşturuldu!");
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Beklenmedik bir hata oluştu: " + e.getMessage());
+        if (employeeOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Çalışan bulunamadı!");
         }
+
+        Employee employee = employeeOpt.get();
+
+        if (employee.getLeaveDays() < leaveRequestDTO.getLeaveDaysRequested()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Yetersiz izin gününüz var!");
+        }
+
+        LeaveRequest leaveRequest = new LeaveRequest(employee, leaveRequestDTO.getLeaveDaysRequested());
+        leaveRequestRepository.save(leaveRequest);
+
+        // 🎯 Bildirim olarak mesaj gönder!
+        String message = employee.getName() + " " + employee.getSurname() + " yeni bir izin talebinde bulundu (" +
+                leaveRequest.getLeaveDaysRequested() + " gün)";
+        rabbitTemplate.convertAndSend("leaveRequestsQueue", message);
+
+        return ResponseEntity.ok("İzin talebi başarıyla oluşturuldu!");
     }
 
     // İzin talebi onaylama
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approveLeaveRequest(@PathVariable UUID id) {
         try {
-            String result = leaveRequestService.approveLeaveRequest(id);
+            ResponseEntity<?> result = leaveRequestService.approveLeaveRequest(id);
             return ResponseEntity.ok(result);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../css/AddEmployee.css";  
+import "../css/AddEmployee.css";
 
 const AddEmployee = () => {
   const [formData, setFormData] = useState({
@@ -9,6 +9,7 @@ const AddEmployee = () => {
     surname: "",
     email: "",
     department: "",
+    role: "EMPLOYEE", // Varsayılan olarak "Çalışan" atanıyor
   });
 
   const [message, setMessage] = useState("");
@@ -35,8 +36,8 @@ const AddEmployee = () => {
   };
 
   return (
-    <div className="add-employee-container">
-      <h1 className="employee-add-title">Yeni Çalışan Ekle</h1>
+    <div style={{ maxWidth: "500px", margin: "auto", padding: "70px", border: "1px solid #ccc", borderRadius: "16px" }}>
+      <h1>Yeni Çalışan Ekle</h1>
       <form onSubmit={handleSubmit}>
         <label>Ad:</label>
         <input type="text" name="name" value={formData.name} onChange={handleChange} required />
@@ -46,7 +47,7 @@ const AddEmployee = () => {
 
         <label>E-posta:</label>
         <input type="email" name="email" value={formData.email} onChange={handleChange} required />
-
+        
         <label>Departman:</label>
         <select name="department" value={formData.department} onChange={handleChange} required>
           <option value="">Departman Seç</option>
@@ -57,11 +58,17 @@ const AddEmployee = () => {
           <option value="Java Developer">Java Geliştirici</option>
         </select>
 
+        <label>Rol:</label>
+        <select name="role" value={formData.role} onChange={handleChange} required>
+          <option value="EMPLOYEE">Çalışan</option>
+          <option value="MANAGER">Yönetici</option>
+        </select>
+
         <button type="submit">Çalışan Ekle</button>
       </form>
 
-      {message && <p className="success-message">{message}</p>}
-      {error && <p className="error-message">{error}</p>}
+      {message && <p style={{ color: "green" }}>{message}</p>}
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };

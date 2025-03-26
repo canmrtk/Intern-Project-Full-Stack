@@ -2,6 +2,7 @@ package com.canmertek.leave_management.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -16,7 +17,9 @@ import java.util.UUID;
 public class LeaveRequest {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false, nullable = false, columnDefinition = "UUID DEFAULT gen_random_uuid()")
     private UUID id;
 
     @ManyToOne
@@ -27,9 +30,7 @@ public class LeaveRequest {
     private LocalDate requestDate;
     private String status;
 
-    // Özel Constructor
     public LeaveRequest(Employee employee, int leaveDaysRequested) {
-        this.id = UUID.randomUUID(); // UUID'yi elle oluşturuyoruz.
         this.employee = employee;
         this.leaveDaysRequested = leaveDaysRequested;
         this.requestDate = LocalDate.now();

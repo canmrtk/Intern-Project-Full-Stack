@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -62,6 +63,9 @@ public class LeaveRequestService {
                 employee.getName(), employee.getSurname(), leaveRequest.getLeaveDaysRequested());
 
         rabbitTemplate.convertAndSend("notificationsQueue", notificationMessage);
+        
+        sendLeaveRequestNotification("Yeni bir izin talebi geldi: " + employee.getEmail());
+
 
         return "İzin talebi başarıyla oluşturuldu ve bildirim gönderildi.";
     }
@@ -74,29 +78,38 @@ public class LeaveRequestService {
         leaveRequestRepository.deleteById(id);
     }
 
-    public String approveLeaveRequest(UUID id) {
+   
+
+    public ResponseEntity<?> approveLeaveRequest(UUID id) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("İzin talebi bulunamadı."));
 
         Employee employee = leaveRequest.getEmployee();
 
-        if (leaveRequest.getStatus().equals("APPROVED")) {
-            throw new IllegalStateException("Bu izin zaten onaylanmış!");
+        if ("APPROVED".equals(leaveRequest.getStatus())) {
+            return ResponseEntity.badRequest().body("Bu izin zaten onaylanmış!");
         }
 
         if (employee.getLeaveDays() < leaveRequest.getLeaveDaysRequested()) {
-            throw new IllegalStateException("Çalışanın yeterli izin günü yok!");
+            return ResponseEntity.badRequest().body("Çalışanın yeterli izin günü yok!");
         }
 
-        // Onay verildiğinde çalışanın izin günlerini düş
+        // İzin gününü düş
         employee.setLeaveDays(employee.getLeaveDays() - leaveRequest.getLeaveDaysRequested());
         employeeRepository.save(employee);
 
         leaveRequest.setStatus("APPROVED");
         leaveRequestRepository.save(leaveRequest);
 
-        return "İzin talebi onaylandı ve çalışanın izin günleri güncellendi.";
+        // RabbitMQ'ya bildirim gönder
+        String message = "İzin onay mesajı: " + employee.getName() + " " + employee.getSurname() +
+                         " isimli çalışanın " + leaveRequest.getLeaveDaysRequested() +
+                         " günlük izin talebi onaylandı.";
+        rabbitTemplate.convertAndSend("leaveRequestsQueue", message);
+
+        return ResponseEntity.ok("İzin talebi onaylandı ve bildirim gönderildi.");
     }
+
 
     public String rejectLeaveRequest(UUID id) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(id)
@@ -109,4 +122,10 @@ public class LeaveRequestService {
         leaveRequestRepository.deleteById(id);
         return "İzin talebi reddedildi.";
     }
+
+
+    public void sendLeaveRequestNotification(String message) {
+        rabbitTemplate.convertAndSend("leaveRequestsQueue", message);
+    }
+
 }
