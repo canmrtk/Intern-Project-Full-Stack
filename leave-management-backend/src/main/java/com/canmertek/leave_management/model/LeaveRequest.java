@@ -30,10 +30,15 @@ public class LeaveRequest {
     private LocalDate requestDate;
     private String status;
 
-    public LeaveRequest(Employee employee, int leaveDaysRequested) {
+    @Enumerated(EnumType.STRING)
+    @Column(name = "leave_type", nullable = false)
+    private LeaveType leaveType;
+
+    public LeaveRequest(Employee employee, int leaveDaysRequested, LeaveType leaveType) {
         this.employee = employee;
         this.leaveDaysRequested = leaveDaysRequested;
         this.requestDate = LocalDate.now();
         this.status = "PENDING";
+        this.leaveType = leaveType;
     }
 }

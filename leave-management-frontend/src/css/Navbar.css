@@ -22,7 +22,7 @@
   .logout-button {
     background: #dc3545;
     color: white;
-    border: none;
+    
     padding: 10px 15px;
     border-radius: 5px;
     cursor: pointer;
@@ -30,5 +30,25 @@
   
   .logout-button:hover {
     background: #a71d2a;
+  }
+
+  .navbar-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  .profile-button {
+    background-color: #06306e;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .profile-button:hover {
+    background-color: #218838;
   }
   

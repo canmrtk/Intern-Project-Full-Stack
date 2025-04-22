@@ -3,10 +3,10 @@ package com.canmertek.leave_management.controller;
 import com.canmertek.leave_management.dto.LeaveRequestDTO;
 import com.canmertek.leave_management.model.Employee;
 import com.canmertek.leave_management.model.LeaveRequest;
-import com.canmertek.leave_management.service.LeaveRequestService;
+import com.canmertek.leave_management.model.LeaveType;
 import com.canmertek.leave_management.repository.EmployeeRepository;
 import com.canmertek.leave_management.repository.LeaveRequestRepository;
-
+import com.canmertek.leave_management.service.LeaveRequestService;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/leave-requests")  // http://localhost:9090/api/leave-requests
+@RequestMapping("/api/leave-requests")
 @CrossOrigin(origins = "http://localhost:3000")
 public class LeaveRequestController {
 
@@ -30,18 +30,15 @@ public class LeaveRequestController {
 
     @Autowired
     private EmployeeRepository employeeRepository;
-    
+
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-
-    // Tüm izin taleplerini listeleme
     @GetMapping
     public ResponseEntity<List<LeaveRequest>> getAllLeaveRequests() {
         return ResponseEntity.ok(leaveRequestService.getAllLeaveRequests());
     }
 
-    // Belirli bir çalışanın izin taleplerini listeleme
     @GetMapping("/employee/{employeeId}")
     public ResponseEntity<?> getLeaveRequestsByEmployee(@PathVariable UUID employeeId) {
         try {
@@ -55,7 +52,6 @@ public class LeaveRequestController {
         }
     }
 
-    // Yeni izin talebi oluştur
     @PostMapping("/request")
     public ResponseEntity<String> requestLeave(@RequestBody LeaveRequestDTO leaveRequestDTO) {
         Optional<Employee> employeeOpt = employeeRepository.findByEmail(leaveRequestDTO.getEmployeeEmail());
@@ -70,23 +66,21 @@ public class LeaveRequestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Yetersiz izin gününüz var!");
         }
 
-        LeaveRequest leaveRequest = new LeaveRequest(employee, leaveRequestDTO.getLeaveDaysRequested());
-        leaveRequestRepository.save(leaveRequest);
+        LeaveRequest leaveRequest = new LeaveRequest(
+                employee,
+                leaveRequestDTO.getLeaveDaysRequested(),
+                leaveRequestDTO.getLeaveType() != null ? leaveRequestDTO.getLeaveType() : LeaveType.ANNUAL
+        );
 
-        // 🎯 Bildirim olarak mesaj gönder!
-        String message = employee.getName() + " " + employee.getSurname() + " yeni bir izin talebinde bulundu (" +
-                leaveRequest.getLeaveDaysRequested() + " gün)";
-        rabbitTemplate.convertAndSend("leaveRequestsQueue", message);
+        leaveRequestRepository.save(leaveRequest);
 
         return ResponseEntity.ok("İzin talebi başarıyla oluşturuldu!");
     }
 
-    // İzin talebi onaylama
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approveLeaveRequest(@PathVariable UUID id) {
         try {
-            ResponseEntity<?> result = leaveRequestService.approveLeaveRequest(id);
-            return ResponseEntity.ok(result);
+            return leaveRequestService.approveLeaveRequest(id);
         } catch (IllegalStateException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (RuntimeException e) {
@@ -94,7 +88,6 @@ public class LeaveRequestController {
         }
     }
 
-    // İzin talebi reddetme
     @PutMapping("/{id}/reject")
     public ResponseEntity<?> rejectLeaveRequest(@PathVariable UUID id) {
         try {
@@ -107,7 +100,6 @@ public class LeaveRequestController {
         }
     }
 
-    // Belirli bir çalışanın izin geçmişini getir
     @GetMapping("/{employeeId}")
     public ResponseEntity<?> getEmployeeLeaveRequests(@PathVariable UUID employeeId) {
         try {

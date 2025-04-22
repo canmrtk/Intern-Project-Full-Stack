@@ -4,37 +4,43 @@ import "../css/NewLeaveRequest.css";
 
 const NewLeaveRequest = ({ user }) => {
   const [leaveDaysRequested, setLeaveDaysRequested] = useState("");
+  const [leaveType, setLeaveType] = useState(""); // YENİ
 
   const [message, setMessage] = useState("");
 
-  const handleChange = (e) => {
+  const handleDaysChange = (e) => {
     const { value } = e.target;
-    
-    // Kullanıcının 1 günden az izin almasını önlüyoruz
-    if (value < 1) {
-      setLeaveDaysRequested(1);
-    } else {
-      setLeaveDaysRequested(value);
-    }
+    setLeaveDaysRequested(value < 1 ? 1 : value);
+  };
+
+  const handleTypeChange = (e) => {
+    setLeaveType(e.target.value);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!leaveDaysRequested || leaveDaysRequested < 1) {
-      setMessage({ text: "Lütfen geçerli bir izin günü girin!", type: "error" });
+    if (!leaveDaysRequested || leaveDaysRequested < 1 || !leaveType) {
+      setMessage({
+        text: "Lütfen geçerli bir izin günü ve izin türü seçin!",
+        type: "error",
+      });
       return;
     }
 
     try {
       const response = await axios.post("http://localhost:9090/api/leave-requests/request", {
-        employeeEmail: user.email, // 📌 Giriş yapan kullanıcının e-postası backend’e gönderilecek
+        employeeEmail: user.email,
         leaveDaysRequested: parseInt(leaveDaysRequested, 10),
+        leaveType: leaveType,
       });
 
       setMessage({ text: response.data, type: "success" });
     } catch (error) {
-      setMessage({ text: error.response?.data || "Bilinmeyen hata oluştu!", type: "error" });
+      setMessage({
+        text: error.response?.data || "Bilinmeyen hata oluştu!",
+        type: "error",
+      });
     }
   };
 
@@ -53,10 +59,20 @@ const NewLeaveRequest = ({ user }) => {
           name="leaveDaysRequested"
           placeholder="Kaç gün izin?"
           value={leaveDaysRequested}
-          onChange={handleChange}
+          onChange={handleDaysChange}
           min="1"
           required
         />
+
+        <label>İzin Türü:</label>
+        <select value={leaveType} onChange={handleTypeChange} required>
+          <option value="">İzin türünü seçiniz</option>
+          <option value="ANNUAL">Yıllık İzin</option>
+          <option value="SICK">Hastalık İzni</option>
+          <option value="UNPAID">Ücretsiz İzin</option>
+          <option value="MATERNITY">Doğum İzni</option>
+        </select>
+
         <button type="submit">Talep Gönder</button>
       </form>
     </div>

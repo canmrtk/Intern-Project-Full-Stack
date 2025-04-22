@@ -6,15 +6,23 @@ const Navbar = ({ setUser }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("user"); // Kullanıcı oturum bilgilerini temizle
-    setUser(null); // Uygulama içindeki state’i sıfırla
+    localStorage.removeItem("user");
+    setUser(null);
     navigate("/"); // Giriş sayfasına yönlendir
   };
 
   return (
     <nav className="navbar">
-      <h2>Kafein Yazılım</h2>
-      <button className="logout-button" onClick={handleLogout}>Çıkış Yap</button>
+      <div className="navbar-left">
+        <h2>Kafein Yazılım</h2>
+      </div>
+
+      <div className="navbar-center">
+        <Link to="/user-profile" className="profile-link">Profilim</Link>
+        <button className="logout-button" onClick={handleLogout}>
+          Çıkış Yap
+        </button>
+      </div>
     </nav>
   );
 };
