@@ -8,7 +8,7 @@ const Navbar = ({ setUser }) => {
   const handleLogout = () => {
     localStorage.removeItem("user");
     setUser(null);
-    navigate("/"); // Giriş sayfasına yönlendir
+    window.location.href = "/"; // Tam sayfa yönlendirme, cache sıfırlanır
   };
 
   return (

@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 
 import Navbar from "./components/Navbar";
 import NotificationBox from "./components/NotificationBox";
-
 import EmployeeList from "./pages/EmployeeList";
 import LeaveRequest from "./pages/LeaveRequest";
 import AddEmployee from "./pages/AddEmployee";
@@ -23,31 +29,47 @@ function AppWrapper() {
     return JSON.parse(localStorage.getItem("user")) || null;
   });
 
+  const [redirected, setRedirected] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
+  // Giriş yapan kullanıcıyı role göre yönlendir
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
+    if (storedUser && !redirected) {
       const parsedUser = JSON.parse(storedUser);
       setUser(parsedUser);
 
-      // Kullanıcı "/" adresine dönerse rolüne göre yönlendir
-      if (window.location.pathname === "/") {
-        if (parsedUser.role === "EMPLOYEE") {
-          navigate("/employee-dashboard", { replace: true });
-        } else if (parsedUser.role === "MANAGER") {
+      if (location.pathname === "/") {
+        if (parsedUser.role === "MANAGER") {
           navigate("/manager-dashboard", { replace: true });
+        } else if (parsedUser.role === "EMPLOYEE") {
+          navigate("/employee-dashboard", { replace: true });
         }
+        setRedirected(true);
       }
     }
-  }, [navigate]);
+  }, [navigate, location.pathname, redirected]);
 
   return (
     <>
       {user && <Navbar setUser={setUser} />}
       {user && <NotificationBox />}
       <Routes>
-        <Route path="/" element={<Login setUser={setUser} />} />
+        <Route
+          path="/"
+          element={
+            user ? (
+              user.role === "EMPLOYEE" ? (
+                <Navigate to="/employee-dashboard" />
+              ) : (
+                <Navigate to="/manager-dashboard" />
+              )
+            ) : (
+              <Login setUser={setUser} />
+            )
+          }
+        />
         <Route path="/register" element={<Register />} />
         <Route
           path="/employee-dashboard"
@@ -72,13 +94,15 @@ function AppWrapper() {
         <Route path="/employee-details/:id" element={<EmployeeDetails />} />
         <Route path="/leave-requests/:employeeId" element={<LeaveRequestDetails />} />
         <Route path="/new-leave-request" element={<NewLeaveRequest user={user} />} />
-        <Route path="/user-profile" element={user ? <UserProfile user={user} /> : <Navigate to="/" />} />
+        <Route
+          path="/user-profile"
+          element={user ? <UserProfile user={user} /> : <Navigate to="/" />}
+        />
       </Routes>
     </>
   );
 }
 
-// Wrapper ile Router dışarıya alındı
 function App() {
   return (
     <Router>

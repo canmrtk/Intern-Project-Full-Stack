@@ -3,7 +3,12 @@ package com.canmertek.leave_management.controller;
 import com.canmertek.leave_management.dto.UserProfileDTO;
 import com.canmertek.leave_management.model.Employee;
 import com.canmertek.leave_management.repository.EmployeeRepository;
+
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,9 +20,10 @@ public class UserController {
     private EmployeeRepository employeeRepository;
 
     @GetMapping("/profile")
-    public UserProfileDTO getUserProfile(@RequestParam String email) {
-        Employee employee = employeeRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
-        return new UserProfileDTO(employee);
+    public ResponseEntity<Employee> getUserProfile(@RequestParam String email) {
+        Optional<Employee> employee = employeeRepository.findByEmail(email);
+        return employee.map(ResponseEntity::ok)
+                       .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
+
 }

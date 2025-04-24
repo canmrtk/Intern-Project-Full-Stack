@@ -1,11 +1,22 @@
 .navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-    background: #333;
-    color: white;
-  }
+  display: flex;
+  justify-content: center; /* Ortalamak için */
+  align-items: center;
+  background-color: #222;
+  padding: 30px 40px;
+  color: white;
+  position: relative;
+}
+.navbar-left {
+  position: absolute;
+  left: 40px;
+}
+
+.navbar-center {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
   
   .navbar ul {
     list-style: none;
