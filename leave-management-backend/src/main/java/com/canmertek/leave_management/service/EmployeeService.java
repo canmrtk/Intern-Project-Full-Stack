@@ -38,18 +38,30 @@ public class EmployeeService {
     }
 
     // Çalışan güncelle
-    public Employee updateEmployee(UUID id, Employee updatedEmployee) {
-        Employee employee = getEmployeeById(id);
-        employee.setName(updatedEmployee.getName());
-        employee.setSurname(updatedEmployee.getSurname());
-        employee.setEmail(updatedEmployee.getEmail());
-        employee.setDepartment(updatedEmployee.getDepartment());
-        return employeeRepository.save(employee);
+ 
+        public Employee updateEmployee(UUID id, Employee updatedEmployeeData) {
+          
+            Employee existingEmployee = getEmployeeById(id); 
+
+       
+            existingEmployee.setName(updatedEmployeeData.getName());
+            existingEmployee.setSurname(updatedEmployeeData.getSurname());
+            existingEmployee.setEmail(updatedEmployeeData.getEmail()); 
+            existingEmployee.setDepartment(updatedEmployeeData.getDepartment());
+          
+
+            return employeeRepository.save(existingEmployee);
+        }
+
+        // Çalışan sil (Refactor edilmiş)
+        public void deleteEmployee(UUID id) {
+            
+            if (!employeeRepository.existsById(id)) {
+                 throw new ResourceNotFoundException("ID " + id + " ile çalışan bulunamadı!");
+            }
+            employeeRepository.deleteById(id); // Doğrudan ID ile sil
+        }
     }
 
-    // Çalışan sil
-    public void deleteEmployee(UUID id) {
-        Employee employee = getEmployeeById(id);
-        employeeRepository.delete(employee);
-    }
-}
+  
+
