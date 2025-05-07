@@ -21,11 +21,13 @@ public class NotificationController {
         this.notificationService = notificationService;
     }
 
+    // Bildirimleri getir (okunmamış)
     @GetMapping("/{userId}")
     public ResponseEntity<List<Notification>> getNotificationsForUser(@PathVariable UUID userId) {
         return ResponseEntity.ok(notificationService.getUnseenNotifications(userId));
     }
 
+    // Bildirimleri "okundu" yap
     @PostMapping("/{userId}/seen")
     public ResponseEntity<String> markNotificationsAsSeen(@PathVariable UUID userId) {
         notificationService.markAllAsSeen(userId);

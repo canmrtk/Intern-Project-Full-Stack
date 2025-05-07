@@ -32,12 +32,15 @@ const Login = ({ setUser }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
-
+  
     try {
       const response = await axios.post("http://localhost:9090/api/auth/login", formData);
       setUser(response.data);
       localStorage.setItem("user", JSON.stringify(response.data));
-
+  
+      
+      localStorage.setItem("userId", response.data.id);  
+  
       if (response.data.role === "MANAGER") {
         navigate("/manager-dashboard");
       } else {
@@ -47,6 +50,7 @@ const Login = ({ setUser }) => {
       setMessage("Giriş başarısız! " + (error.response?.data || "Bilinmeyen hata."));
     }
   };
+  
 
   return (
     <div className="dashboard-container">

@@ -8,28 +8,26 @@ const NotificationBox = () => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        const response = await axios.get("http://localhost:9090/api/notifications");
+        const userId = localStorage.getItem("userId");
+        const response = await axios.get(`http://localhost:9090/api/notifications/${userId}`);
         setNotifications(response.data);
       } catch (error) {
         console.error("Bildirim alınamadı:", error);
       }
     };
-
-    // İlk çağırma
+  
     fetchNotifications();
-
-    // Her 10 saniyede bir kontrol et
     const interval = setInterval(fetchNotifications, 10000);
-
     return () => clearInterval(interval);
   }, []);
+  
 
   return (
     <div className="notification-box">
       <h4>🔔 Bildirimler</h4>
       <ul>
         {notifications.map((msg, index) => (
-          <li key={index}>{msg}</li>
+          <li key={index}>{typeof msg === "string" ? msg : msg.message}</li>
         ))}
       </ul>
     </div>

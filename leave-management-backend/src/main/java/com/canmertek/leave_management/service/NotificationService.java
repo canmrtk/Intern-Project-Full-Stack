@@ -39,4 +39,11 @@ public class NotificationService {
         unseen.forEach(n -> n.setSeen(true));
         notificationRepository.saveAll(unseen);
     }
+    public List<NotificationDto> getUnreadNotifications(Long userId) {
+        return notificationRepository.findByUserIdAndSeenFalseOrderByCreatedAtDesc(userId)
+            .stream()
+            .map(notificationMapper::toDto)
+            .collect(Collectors.toList());
+    }
+
 }
