@@ -1,11 +1,14 @@
 package com.canmertek.leave_management.rabbitmq;
 
 import com.canmertek.leave_management.service.NotificationService;
+import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 @Component
 public class LeaveRequestListener {
@@ -23,18 +26,22 @@ public class LeaveRequestListener {
     @RabbitListener(queues = "leaveRequestsQueue")
     public void receiveMessage(String message) {
         try {
-            logger.info(" RabbitMQ'dan mesaj alındı: {}", message);
+            logger.info("RabbitMQ'dan mesaj alındı: {}", message);
 
             if (message == null || message.trim().isEmpty()) {
                 throw new IllegalArgumentException("Boş mesaj alındı.");
             }
 
-            // Bildirim servisine mesajı ekle
-            notificationService.addNotification(message);
-            logger.info(" Bildirim servisine eklendi: {}", message);
+            // Mesaj formatı: {"userId":"uuid","message":"İzin talebi geldi!"}
+            JSONObject json = new JSONObject(message);
+            UUID userId = UUID.fromString(json.getString("userId"));
+            String msg = json.getString("message");
+
+            notificationService.saveNotification(userId, msg);
+            logger.info("Bildirim kaydedildi: {} - {}", userId, msg);
 
         } catch (Exception e) {
-            logger.error(" Hata: {} | Mesaj tekrar kuyruğa eklendi.", e.getMessage());
+            logger.error("RabbitMQ mesaj işlenirken hata: {} | Mesaj tekrar kuyruğa alındı.", e.getMessage());
             rabbitTemplate.convertAndSend("leaveRequestsQueue", message); // Retry
         }
     }

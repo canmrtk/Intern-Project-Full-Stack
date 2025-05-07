@@ -1,24 +1,42 @@
 package com.canmertek.leave_management.service;
 
+import com.canmertek.leave_management.model.Employee;
+import com.canmertek.leave_management.model.Notification;
+import com.canmertek.leave_management.repository.EmployeeRepository;
+import com.canmertek.leave_management.repository.NotificationRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class NotificationService {
 
-    private final List<String> notifications = new LinkedList<>();
+    @Autowired
+    private NotificationRepository notificationRepository;
 
-    public void addNotification(String message) {
-        notifications.add(0, message); // Son gelen mesaj en başta gösterilir
-        if (notifications.size() > 20) {
-            notifications.remove(notifications.size() - 1); // Son 20 mesajı tut
-        }
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    public void saveNotification(UUID userId, String message) {
+        Employee user = employeeRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        Notification notification = new Notification();
+        notification.setUser(user);
+        notification.setMessage(message);
+        notificationRepository.save(notification);
     }
 
-    public List<String> getAllNotifications() {
-        return Collections.unmodifiableList(notifications);
+    public List<Notification> getUnseenNotifications(UUID userId) {
+        Employee user = employeeRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
+        return notificationRepository.findByUserAndSeenFalseOrderByCreatedAtDesc(user);
+    }
+
+    public void markAllAsSeen(UUID userId) {
+        List<Notification> unseen = getUnseenNotifications(userId);
+        unseen.forEach(n -> n.setSeen(true));
+        notificationRepository.saveAll(unseen);
     }
 }
