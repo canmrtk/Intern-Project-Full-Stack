@@ -37,9 +37,16 @@ const Login = ({ setUser }) => {
       const response = await axios.post("http://localhost:9090/api/auth/login", formData);
       setUser(response.data);
       localStorage.setItem("user", JSON.stringify(response.data));
-  
-      
-      localStorage.setItem("userId", response.data.id);  
+      localStorage.setItem("userId", response.data.id);
+      if (response.data && response.data.id) {
+        localStorage.setItem("userId", response.data.id); // response.data.id bir UUID string olmalı
+        console.log("Login successful, userId stored:", response.data.id);
+      } else {
+        console.error("Login response did not contain a user ID or user data:", response.data);
+        // Kullanıcıya bir hata mesajı gösterebilir veya yönlendirmeyi engelleyebilirsiniz.
+        setMessage("Giriş başarılı ancak kullanıcı ID alınamadı. Lütfen tekrar deneyin.");
+        return; // Hata durumunda dashboard'a yönlendirmeyi engelle
+      }
   
       if (response.data.role === "MANAGER") {
         navigate("/manager-dashboard");

@@ -7,6 +7,7 @@ import com.canmertek.leave_management.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.annotation.PostConstruct;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,11 +40,6 @@ public class NotificationService {
         unseen.forEach(n -> n.setSeen(true));
         notificationRepository.saveAll(unseen);
     }
-    public List<NotificationDto> getUnreadNotifications(Long userId) {
-        return notificationRepository.findByUserIdAndSeenFalseOrderByCreatedAtDesc(userId)
-            .stream()
-            .map(notificationMapper::toDto)
-            .collect(Collectors.toList());
-    }
+
 
 }

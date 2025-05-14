@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import axios from "axios";
+
+import { addEmployee } from "../api"; // axios yerine api.js'den import
+
 import { useNavigate } from "react-router-dom";
-import "../css/AddEmployee.css";
+import "../css/AddEmployee.css"; 
 
 const AddEmployee = () => {
   const [formData, setFormData] = useState({
@@ -9,9 +11,9 @@ const AddEmployee = () => {
     surname: "",
     email: "",
     department: "",
-    role: "EMPLOYEE", // Varsayılan olarak "Çalışan" atanıyor
+    role: "EMPLOYEE",
+   
   });
-
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -25,31 +27,50 @@ const AddEmployee = () => {
     setMessage("");
     setError("");
 
-    try {
-      await axios.post("http://localhost:9090/api/employees", formData);
-      setMessage("Çalışan başarıyla eklendi!");
-      setTimeout(() => navigate("/employees"), 2000);
-    } catch (error) {
-      setError("Çalışan eklenirken hata oluştu! " + (error.response?.data?.message || "Bilinmeyen hata."));
-      console.error("Çalışan ekleme hatası:", error);
+   
+    if (!formData.name || !formData.surname || !formData.email || !formData.department || !formData.role) {
+        setError("Lütfen tüm zorunlu alanları doldurun.");
+        return;
     }
+ 
+    try {
+ 
+      const newEmployeeData = {
+        name: formData.name,
+        surname: formData.surname,
+        email: formData.email,
+        department: formData.department,
+        role: formData.role,
+        
+      };
+
+      const responseData = await addEmployee(newEmployeeData); // api.js'deki fonksiyon
+      setMessage(`Çalışan başarıyla eklendi! ID: ${responseData.id}`);
+      setFormData({ name: "", surname: "", email: "", department: "", role: "EMPLOYEE" }); 
+      setTimeout(() => navigate("/employees"), 2000);
+    } catch (err) {
+      console.error("Çalışan ekleme hatası (AddEmployee):", err);
+      setError(err); 
+    }
+    
   };
 
   return (
     <div style={{ maxWidth: "500px", margin: "auto", padding: "70px", border: "1px solid #ccc", borderRadius: "16px" }}>
       <h1>Yeni Çalışan Ekle</h1>
       <form onSubmit={handleSubmit}>
-        <label>Ad:</label>
-        <input type="text" name="name" value={formData.name} onChange={handleChange} required />
+       
+        <label htmlFor="name_add_emp">Ad:</label>
+        <input id="name_add_emp" type="text" name="name" value={formData.name} onChange={handleChange} required />
 
-        <label>Soyad:</label>
-        <input type="text" name="surname" value={formData.surname} onChange={handleChange} required />
+        <label htmlFor="surname_add_emp">Soyad:</label>
+        <input id="surname_add_emp" type="text" name="surname" value={formData.surname} onChange={handleChange} required />
 
-        <label>E-posta:</label>
-        <input type="email" name="email" value={formData.email} onChange={handleChange} required />
+        <label htmlFor="email_add_emp">E-posta:</label>
+        <input id="email_add_emp" type="email" name="email" value={formData.email} onChange={handleChange} required />
         
-        <label>Departman:</label>
-        <select name="department" value={formData.department} onChange={handleChange} required>
+        <label htmlFor="department_add_emp">Departman:</label>
+        <select id="department_add_emp" name="department" value={formData.department} onChange={handleChange} required>
           <option value="">Departman Seç</option>
           <option value="Human Resources">İnsan Kaynakları</option>
           <option value="Software Development">Yazılım Geliştirme</option>
@@ -58,17 +79,19 @@ const AddEmployee = () => {
           <option value="Java Developer">Java Geliştirici</option>
         </select>
 
-        <label>Rol:</label>
-        <select name="role" value={formData.role} onChange={handleChange} required>
+        <label htmlFor="role_add_emp">Rol:</label>
+        <select id="role_add_emp" name="role" value={formData.role} onChange={handleChange} required>
           <option value="EMPLOYEE">Çalışan</option>
           <option value="MANAGER">Yönetici</option>
         </select>
 
+        
+
         <button type="submit">Çalışan Ekle</button>
       </form>
 
-      {message && <p style={{ color: "green" }}>{message}</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {message && <p style={{ color: "green", marginTop: "10px" }}>{message}</p>}
+      {error && <p style={{ color: "red", marginTop: "10px" }}>Hata: {error}</p>}
     </div>
   );
 };

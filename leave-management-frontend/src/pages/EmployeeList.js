@@ -1,30 +1,42 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
+import { getEmployees } from "../api"; // axios yerine api.js'den import 
+
 import { Link } from "react-router-dom";
-import "../css/EmployeeList.css";
+import "../css/EmployeeList.css"; 
 
 const EmployeeList = () => {
   const [employees, setEmployees] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [departmentFilter, setDepartmentFilter] = useState("");
+  
+  const [error, setError] = useState(""); // Hata mesajları için state
+ 
 
   useEffect(() => {
     fetchEmployees();
   }, []);
 
   const fetchEmployees = async () => {
+    
+    setError(""); // Her fetch öncesi hatayı temizle
     try {
-      const response = await axios.get("http://localhost:9090/api/employees");
-      setEmployees(response.data.reverse()); 
-    } catch (error) {
-      console.error("Çalışanları getirirken hata oluştu:", error);
+      const data = await getEmployees(); // api.js'deki fonksiyon
+      setEmployees(data.reverse()); 
+    } catch (err) {
+      console.error("Çalışanları getirirken hata oluştu (EmployeeList):", err);
+      setError(err); 
+      setEmployees([]); // Hata durumunda listeyi boşalt
     }
+    
   };
 
   const filteredEmployees = employees.filter((employee) => {
     return (
-      (searchTerm === "" || employee.name.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (departmentFilter === "" || employee.department.toLowerCase() === departmentFilter.toLowerCase())
+      (searchTerm === "" ||
+        (employee.name && employee.name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (employee.surname && employee.surname.toLowerCase().includes(searchTerm.toLowerCase()))) &&
+      (departmentFilter === "" || (employee.department && employee.department.toLowerCase() === departmentFilter.toLowerCase()))
     );
   });
 
@@ -32,16 +44,18 @@ const EmployeeList = () => {
     <div className="employee-list-container">
       <h1 className="employee-list-title">Çalışan Listesi</h1>
 
-      {/* Arama Kutusu */}
+    
+      {error && <p className="error-message" style={{ color: "red" }}>Hata: {error}</p>}
+     
+
       <input
         type="text"
         className="search-input"
-        placeholder="Çalışan Ara..."
+        placeholder="Çalışan Adı veya Soyadıyla Ara..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
 
-      {/* Departman Filtreleme */}
       <select
         className="department-filter"
         value={departmentFilter}
@@ -55,7 +69,6 @@ const EmployeeList = () => {
         <option value="Java Developer">Java Geliştirici</option>
       </select>
 
-      {/* Çalışan Listesi */}
       <ul>
         {filteredEmployees.length > 0 ? (
           filteredEmployees.map((employee) => (
@@ -75,7 +88,7 @@ const EmployeeList = () => {
             </li>
           ))
         ) : (
-          <p className="employee-info">Çalışan bulunamadı.</p>
+          !error && <p className="employee-info">Çalışan bulunamadı veya listelenecek çalışan yok.</p> // Hata yoksa bu mesajı göster
         )}
       </ul>
     </div>
