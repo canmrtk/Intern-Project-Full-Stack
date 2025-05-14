@@ -1,15 +1,17 @@
 import React, { useState } from "react";
-import axios from "axios";
-import "../css/NewLeaveRequest.css"; 
+
+import { createLeaveRequest } from "../api"; 
+
+import "../css/NewLeaveRequest.css";
 
 const NewLeaveRequest = ({ user }) => {
   const [leaveDaysRequested, setLeaveDaysRequested] = useState("");
   const [leaveType, setLeaveType] = useState("");
-  const [message, setMessage] = useState({ text: "", type: "" }); 
+  const [message, setMessage] = useState({ text: "", type: "" });
 
   const handleDaysChange = (e) => {
     const { value } = e.target;
-    setLeaveDaysRequested(value < 1 ? "" : value); 
+    setLeaveDaysRequested(value < 1 ? "" : value);
   };
 
   const handleTypeChange = (e) => {
@@ -18,7 +20,8 @@ const NewLeaveRequest = ({ user }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ text: "", type: "" }); 
+    setMessage({ text: "", type: "" });
+
     if (!leaveDaysRequested || parseInt(leaveDaysRequested, 10) < 1 || !leaveType) {
       setMessage({
         text: "Lütfen geçerli bir izin günü (en az 1) ve izin türü seçin!",
@@ -35,54 +38,40 @@ const NewLeaveRequest = ({ user }) => {
       return;
     }
 
+    
     try {
-      const response = await axios.post("http://localhost:9090/api/leave-requests/request", {
+      const leaveRequestData = {
         employeeEmail: user.email,
         leaveDaysRequested: parseInt(leaveDaysRequested, 10),
         leaveType: leaveType,
-      });
+      };
+      
+      const responseData = await createLeaveRequest(leaveRequestData); // api.js'deki fonksiyon
 
-    
-      if (response.status === 201 && response.data) { 
+      
+      if (responseData && responseData.id) {
          setMessage({
-          text: `İzin talebiniz başarıyla oluşturuldu. `, // Örnek mesaj
+          text: `İzin talebiniz başarıyla oluşturuldu. Talep ID: ${responseData.id}`,
           type: "success"
         });
-        // Formu sıfırla
         setLeaveDaysRequested("");
         setLeaveType("");
       } else {
-        // Beklenmedik başarılı yanıt durumu
-         setMessage({ text: response.data || "İzin talebi gönderildi ancak sunucudan beklenmedik bir yanıt alındı.", type: "success" });
+         setMessage({ text: responseData || "İzin talebi gönderildi ancak sunucudan beklenmedik bir yanıt alındı.", type: "success" });
       }
-     
-
-    } catch (error) {
-      console.error("İzin talebi gönderme hatası:", error.response || error.message);
-     
-      let errorMessageText = "Bilinmeyen bir hata oluştu!";
-      if (error.response && error.response.data) {
-        if (typeof error.response.data === 'string') {
-          errorMessageText = error.response.data;
-        } else if (error.response.data.message) { 
-          errorMessageText = error.response.data.message;
-        } else if (typeof error.response.data === 'object') {
-            
-            const messages = Object.values(error.response.data);
-            if(messages.length > 0) errorMessageText = messages.join(", ");
-        }
-      } else if (error.message) {
-        errorMessageText = error.message;
-      }
+    } catch (err) {
+      console.error("İzin talebi gönderme hatası (NewLeaveRequest):", err);
+    
       setMessage({
-        text: errorMessageText,
+        text: err, 
         type: "error",
       });
-    
     }
+   
   };
 
   return (
+  
     <div className="leave-request-container">
       <h1 className="leave-request-title">Yeni İzin Talebi</h1>
       {message.text && (
@@ -91,20 +80,19 @@ const NewLeaveRequest = ({ user }) => {
         </p>
       )}
       <form onSubmit={handleSubmit}>
-        <label htmlFor="leaveDaysRequested">Kaç gün izin almak istiyorsun?</label>
+        <label htmlFor="leaveDaysRequested_new">Kaç gün izin almak istiyorsun?</label>
         <input
-          id="leaveDaysRequested"
+          id="leaveDaysRequested_new"
           type="number"
           name="leaveDaysRequested"
           placeholder="Kaç gün izin?"
           value={leaveDaysRequested}
           onChange={handleDaysChange}
           min="1"
-          
         />
 
-        <label htmlFor="leaveType">İzin Türü:</label>
-        <select id="leaveType" name="leaveType" value={leaveType} onChange={handleTypeChange} > {/* required kaldırıldı */}
+        <label htmlFor="leaveType_new">İzin Türü:</label>
+        <select id="leaveType_new" name="leaveType" value={leaveType} onChange={handleTypeChange} >
           <option value="">İzin türünü seçiniz</option>
           <option value="ANNUAL">Yıllık İzin</option>
           <option value="SICK">Hastalık İzni</option>

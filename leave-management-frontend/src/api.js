@@ -76,8 +76,19 @@ export const markNotificationsAsSeen = async (userId) => {
   try {
 
     const response = await api.post(`/notifications/${userId}/seen`);
-    return response.data; // Backend'den dönen mesaj ("Tüm bildirimler okundu olarak işaretlendi.")
+    return response.data; // Backend'den dönen mesaj ("Tüm bildirimler okundu olarak işaretlendi.") 
   } catch (error) {
     throw handleError(error); 
+  }
+};
+
+export const createLeaveRequest = async (leaveRequestData) => {
+  // leaveRequestData: { employeeEmail, leaveDaysRequested, leaveType }
+  try {
+    const response = await api.post("/leave-requests/request", leaveRequestData);
+    
+    return response.data;
+  } catch (error) {
+    throw handleError(error);
   }
 };

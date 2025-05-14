@@ -1,88 +1,126 @@
-// ./src/components/NotificationBox.js
-import React, { useEffect, useState } from "react"; // useState'i import ettiğinizden emin olun
-import axios from "axios";
-import "./NotificationBox.css"; // CSS dosyanızın yolu doğruysa
+import React, { useEffect, useState, useCallback } from "react";
+import "./NotificationBox.css";
+import { markNotificationsAsSeen } from "../api";
+
+
+import axios from "axios"; 
+
+
 
 const NotificationBox = () => {
   const [notifications, setNotifications] = useState([]);
-  // ---- DEĞİŞİKLİK BAŞLANGICI ----
-  const [errorMessage, setErrorMessage] = useState(""); // Hata mesajları için state
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState(localStorage.getItem("userId"));
 
-  // Hata mesajını ayarlamak için yardımcı fonksiyon
   const setMessageStateOnError = (message) => {
     setErrorMessage(message);
   };
-  // ---- DEĞİŞİKLİK SONU ----
+
+  const fetchNotifications = useCallback(async () => {
+    // console.log("NotificationBox callback - userId:", userId); // userId'yi kontrol et
+    if (!userId || userId === "undefined" || userId === "null") {
+    
+      return;
+    }
+    
+    setErrorMessage("");
+    setIsLoading(true);
+
+    try {
+      
+      const response = await axios.get(`http://localhost:9090/api/notifications/${userId}`);
+      
+      
+      if (response.data) {
+        setNotifications(response.data);
+      } else {
+        setNotifications([]);
+      }
+    } catch (error) {
+      console.error("NotificationBox - Error fetching notifications:", error);
+      if (error.response) {
+        setMessageStateOnError(typeof error.response.data === 'string' ? error.response.data : `Sunucu hatası: ${error.response.status}`);
+      } else if (error.request) {
+        setMessageStateOnError("Sunucuya ulaşılamadı.");
+      } else {
+        setMessageStateOnError(`Bir hata oluştu: ${error.message}`);
+      }
+      setNotifications([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId]); // userId bağımlılığını koru
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      const userId = localStorage.getItem("userId");
-      console.log("NotificationBox - Attempting to fetch notifications. Raw userId from localStorage:", userId);
+    const currentUserId = localStorage.getItem("userId");
+    // console.log("NotificationBox useEffect - currentUserId from localStorage:", currentUserId, "state userId:", userId);
+    if (currentUserId !== userId) {
+        setUserId(currentUserId);
+    }
 
-      // ---- ÖNCEKİ CEVAPTAN GELEN KONTROL ----
-      if (!userId || userId === "undefined" || userId === "null") {
-        console.warn("NotificationBox: Kullanıcı ID bulunamadı veya geçersiz (localStorage değeri: '" + userId + "'). Istek yapılmayacak.");
+    
+    if (userId && userId !== "null" && userId !== "undefined") {
+        fetchNotifications(); 
+        const interval = setInterval(fetchNotifications, 10000);
+        return () => clearInterval(interval);
+    } else {
+        
         setNotifications([]);
-        // ---- DEĞİŞİKLİK: Hata mesajını burada da ayarlayabiliriz ----
-        setMessageStateOnError("Bildirimleri almak için kullanıcı ID bulunamadı.");
-        // ---- DEĞİŞİKLİK SONU ----
-        return;
-      }
-      // ---- KONTROL SONU ----
+        
+    }
+  }, [userId, fetchNotifications]);
 
-      // ---- DEĞİŞİKLİK BAŞLANGICI: Her istek öncesi eski hata mesajını temizle ----
-      setErrorMessage("");
-      // ---- DEĞİŞİKLİK SONU ----
 
-      try {
-        const apiUrl = `http://localhost:9090/api/notifications/${userId}`;
-        console.log("NotificationBox - Fetching notifications from URL:", apiUrl);
-        const response = await axios.get(apiUrl);
-        console.log("NotificationBox - API response:", response);
-
-        if (response.data) {
-          setNotifications(response.data);
-        } else {
-          setNotifications([]);
-          console.warn("NotificationBox - API'den boş veya tanımsız veri geldi.");
-          // İsteğe bağlı: setMessageStateOnError("Bildirimler alınamadı veya boş geldi.");
-        }
-      } catch (error) {
-        console.error("NotificationBox - Bildirimler alınırken HATA oluştu:", error);
-        if (error.response) {
-          console.error("Error response data:", error.response.data);
-          console.error("Error response status:", error.response.status);
-          console.error("Error response headers:", error.response.headers);
-          setMessageStateOnError(typeof error.response.data === 'string' ? error.response.data : `Sunucu hatası: ${error.response.status}`);
-        } else if (error.request) {
-          console.error("Error request:", error.request);
-          setMessageStateOnError("Sunucuya ulaşılamadı. Network bağlantınızı kontrol edin.");
-        } else {
-          console.error("Error message:", error.message);
-          setMessageStateOnError(`Bir hata oluştu: ${error.message}`);
-        }
-        setNotifications([]); // Hata durumunda bildirimleri temizle
-      }
-    };
-
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 10000); // 10 saniyede bir
-    return () => clearInterval(interval);
-  }, []); // Bağımlılık dizisi boş
+  const handleMarkAsSeen = async () => {
+    if (!userId) {
+      setMessageStateOnError("Kullanıcı ID bulunamadığı için bildirimler okundu olarak işaretlenemedi.");
+      return;
+    }
+    setErrorMessage("");
+    setIsLoading(true);
+    try {
+      const responseMessage = await markNotificationsAsSeen(userId);
+      // console.log(responseMessage);
+      setNotifications([]); 
+      
+      // setMessageStateOnError("Tüm bildirimler okundu olarak işaretlendi."); // Bunu farklı bir state ile yönetmek daha iyi olabilir (örn: successMessage)
+    } catch (err) {
+      console.error("Bildirimleri okundu işaretlerken hata:", err);
+      setMessageStateOnError(err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="notification-box">
-      <h4><span role="img" aria-label="notification">🔔</span> Bildirimler</h4>
-      {/* ---- DEĞİŞİKLİK BAŞLANGICI: Hata mesajını göster ---- */}
-      {errorMessage && <p className="error-message-notification" style={{ color: 'red', fontSize: '12px' }}>{errorMessage}</p>}
-      {/* ---- DEĞİŞİKLİK SONU ---- */}
-      <ul>
-        {notifications.length === 0 && !errorMessage && (
-          <li>Okunmamış bildiriminiz yok.</li>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+        <h4><span role="img" aria-label="notification">🔔</span> Bildirimler</h4>
+        {notifications.length > 0 && (
+          <button 
+            onClick={handleMarkAsSeen} 
+            disabled={isLoading}
+            style={{ fontSize: '10px', padding: '2px 5px', cursor: 'pointer', border: '1px solid #ccc', borderRadius: '3px' }}
+            title="Tümünü okundu işaretle"
+          >
+            ✔️ Hepsini Oku
+          </button>
         )}
-        {notifications.map((notificationItem, index) => ( // msg yerine notificationItem kullandım, daha açıklayıcı
-          <li key={notificationItem.id || index}> {/* Backend'den ID geliyorsa onu kullanmak daha iyi */}
-            {typeof notificationItem === "string" ? notificationItem : notificationItem.message}
+      </div>
+
+      {errorMessage && <p className="error-message-notification" style={{ color: "red", fontSize: '12px', margin: '5px 0' }}>{errorMessage}</p>}
+      
+      {isLoading && notifications.length === 0 && <p style={{fontSize: '12px', color: '#555'}}>Yükleniyor...</p>}
+
+      <ul>
+        {!isLoading && notifications.length === 0 && !errorMessage && (
+          <li style={{fontSize: '12px', color: '#777', fontStyle: 'italic'}}>Okunmamış bildiriminiz yok.</li>
+        )}
+        {notifications.map((notificationItem) => (
+          
+          <li key={notificationItem.id ? notificationItem.id : notificationItem.message}> 
+            {notificationItem.message}
           </li>
         ))}
       </ul>
